@@ -104,17 +104,35 @@ func (m *Message) mimeVersion() string {
 // GetHeader returns the undecoded value of header if found. To access the
 // raw (potentially encoded) value of header, use the Message.Header.
 func (m *Message) GetHeader(header string) string {
-	encoded := textproto.MIMEHeader(m.Header).Get(header)
-	if encoded == "" {
+	e := textproto.MIMEHeader(m.Header).Get(header)
+	if e == "" {
 		return ""
 	}
 	dec := new(qp.WordDecoder)
-	decoded, err := dec.DecodeHeader(encoded)
+	decoded, err := dec.DecodeHeader(e)
 	if err != nil {
 		return ""
 	}
-
 	return decoded
+}
+
+func (m *Message) GetMultipleHeaderValues(header string) (values []string) {
+	headers := textproto.MIMEHeader(m.Header)
+	list := headers[header]
+	for _, v := range list {
+		dec := new(qp.WordDecoder)
+		decoded, err := dec.DecodeHeader(v)
+		if err != nil {
+			continue
+		}
+		values = append(values, decoded)
+	}
+	return values
+}
+
+// AddHeader appends the header value to the list of values for this header key
+func (m *Message) AddHeader(header, value string) {
+	textproto.MIMEHeader(m.Header).Add(header, value)
 }
 
 // SetHeader adds header to the list of headers and sets it to quoted-printable

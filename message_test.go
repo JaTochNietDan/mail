@@ -462,6 +462,24 @@ func TestMessageSubjectComplex(t *testing.T) {
 	}
 }
 
+func TestRecievedHeaderMultipleValues(t *testing.T) {
+	received := []string{"Me", "You", "Everyone"}
+	msg := NewMessage()
+	for _, v := range received {
+		msg.AddHeader("Received", v)
+	}
+
+	headers := msg.GetMultipleHeaderValues("Received")
+	if len(headers) != len(received) {
+		t.Error("Not same count of headers")
+	}
+	for _, v := range headers {
+		if v != "Me" && v != "You" && v != "Everyone" {
+			t.Error("Did not return all Received values")
+		}
+	}
+}
+
 func TestMessageMessageID(t *testing.T) {
 	id := "9876-message-id"
 	msg := NewMessage()
