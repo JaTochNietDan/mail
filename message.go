@@ -1022,11 +1022,14 @@ func (p *Multipart) AddAttachment(attachType AttachmentType, filename, contentId
 
 	header := textproto.MIMEHeader(map[string][]string{
 		"Content-Type":              {mediaType},
-		"Content-ID":                {fmt.Sprintf("<%s>", contentIdName)},
 		"Content-Location":          {fmt.Sprintf("%s", filename)},
 		"Content-Transfer-Encoding": {"base64"},
 		"Content-Disposition":       {fmt.Sprintf("%s;\r\n\tfilename=%s;", attachType, filename)},
 	})
+
+	if attachType == Inline {
+		header.Set("Content-ID", fmt.Sprintf("<%s>", contentIdName))
+	}
 
 	w, err := p.writer.CreatePart(header)
 	if err != nil {
