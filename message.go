@@ -1028,7 +1028,16 @@ func (p *Multipart) AddAttachment(attachType AttachmentType, filename, contentId
 	})
 
 	if attachType == Inline {
-		header.Set("Content-ID", fmt.Sprintf("<%s>", contentIdName))
+		tag := "<%s>"
+		if contentIdName != "" {
+			if contentIdName[:1] == "<" && contentIdName[len(contentIdName)-1:] == ">" {
+				tag = "%s"
+			}
+		} else {
+			contentIdName = filename
+		}
+
+		header.Set("Content-ID", fmt.Sprintf(tag, contentIdName))
 	}
 
 	w, err := p.writer.CreatePart(header)
