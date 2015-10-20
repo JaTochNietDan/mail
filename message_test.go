@@ -62,7 +62,7 @@ func ExampleMessage_mixed() {
 	alternative.AddText("text/plain", text)
 	alternative.AddText("text/html", html)
 	alternative.Close()
-	mixed.AddAttachment(Attachment, "Photo", "image/jpeg", attachment)
+	mixed.AddAttachment(Attachment, "Photo", "cid:1234567", "image/jpeg", attachment)
 	mixed.Close()
 
 	fmt.Println(msg)
@@ -89,7 +89,7 @@ func ExampleMessage_cid() {
 
 	// Load the photo and add the attachment with filename.
 	attachment, _ := ioutil.ReadFile("path/of/image.jpg")
-	mixed.AddAttachment(Attachment, filename, "image/jpeg", bytes.NewReader(attachment))
+	mixed.AddAttachment(Attachment, filename, "cid:1234567", "image/jpeg", bytes.NewReader(attachment))
 
 	// Closing mixed, the parent part.
 	mixed.Close()
@@ -561,7 +561,7 @@ func TestReadMessage(t *testing.T) {
 	sent.SetSubject("Gopher image envoyée par email")
 	mixed := NewMultipart("multipart/mixed", sent)
 	mixed.AddText("text/plain", text)
-	mixed.AddAttachment(Attachment, "Gopher.png", "", attachment)
+	mixed.AddAttachment(Attachment, "Gopher.png", "cid:1234567", "", attachment)
 	mixed.Close()
 
 	read, err := ReadMessage(bytes.NewBuffer(sent.Bytes()))
@@ -619,7 +619,7 @@ This package was designed with the idea of eventually replacing the one in the s
 	msg.SetSubject("Gopher image envoyée par email")
 	mixed := NewMultipart("multipart/mixed", msg)
 	mixed.AddText("text/plain", text)
-	mixed.AddAttachment(Attachment, "Gopher.png", "", attachment)
+	mixed.AddAttachment(Attachment, "Gopher.png", "cid:1234567", "", attachment)
 	mixed.Close()
 
 	ioutil.WriteFile("tests/gopher.eml", msg.Bytes(), os.ModePerm)

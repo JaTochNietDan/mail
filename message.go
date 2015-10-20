@@ -1007,7 +1007,7 @@ func (p *Multipart) AddText(mediaType string, r io.Reader) error {
 // In the following example, the media MIME type will be set to "image/png"
 // based on the ".png" extension of the filename "gopher.png":
 // 	part.AddAttachment(Inline, "gopher.png", "", image)
-func (p *Multipart) AddAttachment(attachType AttachmentType, filename, mediaType string, r io.Reader) (err error) {
+func (p *Multipart) AddAttachment(attachType AttachmentType, filename, contentIdName, mediaType string, r io.Reader) (err error) {
 	if p.isClosed {
 		return ErrPartClosed
 	}
@@ -1022,7 +1022,7 @@ func (p *Multipart) AddAttachment(attachType AttachmentType, filename, mediaType
 
 	header := textproto.MIMEHeader(map[string][]string{
 		"Content-Type":              {mediaType},
-		"Content-ID":                {fmt.Sprintf("<%s>", filename)},
+		"Content-ID":                {fmt.Sprintf("<%s>", contentIdName)},
 		"Content-Location":          {fmt.Sprintf("%s", filename)},
 		"Content-Transfer-Encoding": {"base64"},
 		"Content-Disposition":       {fmt.Sprintf("%s;\r\n\tfilename=%s;", attachType, filename)},
