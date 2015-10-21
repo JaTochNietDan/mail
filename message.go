@@ -1024,7 +1024,7 @@ func (p *Multipart) AddAttachment(attachType AttachmentType, filename, contentId
 		"Content-Type":              {mediaType},
 		"Content-Location":          {fmt.Sprintf("%s", filename)},
 		"Content-Transfer-Encoding": {"base64"},
-		"Content-Disposition":       {fmt.Sprintf("%s;\r\n\tfilename=%s;", attachType, filename)},
+		"Content-Disposition":       {fmt.Sprintf(`%s;\r\n\tfilename="%s";`, attachType, filename)},
 	})
 
 	if attachType == Inline {
