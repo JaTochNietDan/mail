@@ -1064,10 +1064,6 @@ func (p *Multipart) AddAttachment(attachType AttachmentType, filename, contentId
 		if _, err := encoder.Write(buffer[:read]); err != nil {
 			return err
 		}
-
-		if read == len(buffer) {
-			fmt.Fprintf(w, crlf)
-		}
 	}
 	encoder.Close()
 	fmt.Fprintf(w, crlf)
