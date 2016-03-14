@@ -975,6 +975,7 @@ func (p *Multipart) AddText(mediaType string, r io.Reader) error {
 
 	reader := bufio.NewReader(r)
 	encoder := qp.NewWriter(w)
+	defer encoder.Close()
 	buffer := make([]byte, maxLineLen)
 	for {
 		read, err := reader.Read(buffer[:])
