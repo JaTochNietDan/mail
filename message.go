@@ -975,7 +975,12 @@ func (p *Multipart) AddText(mediaType string, r io.Reader) error {
 
 	reader := bufio.NewReader(r)
 	encoder := qp.NewWriter(w)
-	defer encoder.Close()
+	defer func() {
+		encoder.Close()
+		fmt.Fprintf(w, crlf)
+		fmt.Fprintf(w, crlf)
+	}()
+
 	buffer := make([]byte, maxLineLen)
 	for {
 		read, err := reader.Read(buffer[:])
@@ -987,8 +992,6 @@ func (p *Multipart) AddText(mediaType string, r io.Reader) error {
 		}
 		encoder.Write(buffer[:read])
 	}
-	fmt.Fprintf(w, crlf)
-	fmt.Fprintf(w, crlf)
 	return nil
 }
 
