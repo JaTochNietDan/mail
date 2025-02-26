@@ -7,6 +7,7 @@ package mail
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -522,12 +523,12 @@ func TestMessageBodyWriter(t *testing.T) {
 	msg := NewMessage()
 
 	// Writing
-	if _, err := fmt.Fprintf(msg.Body, string(data)); err != nil {
+	if _, err := fmt.Fprint(msg.Body, string(data)); err != nil {
 		t.Error("failed to write data in Body:", err)
 	}
 
 	// Reading
-	read, err := ioutil.ReadAll(msg.Body)
+	read, err := io.ReadAll(msg.Body)
 	if err != nil {
 		t.Error("failed reading data from message body:", err)
 	}

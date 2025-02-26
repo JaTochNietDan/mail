@@ -11,7 +11,7 @@
 // This package can replace the net/mail package of the standard library without
 // breaking your existing code.
 //
-// Features
+// # Features
 //
 // - multipart support
 //
@@ -23,18 +23,19 @@
 //
 // - getters and setters common headers
 //
-// Known issues
+// # Known issues
 //
 // - Quoted-printable encoding does not respect the 76 characters per line
 // limitation imposed by RFC 2045 (https://github.com/golang/go/issues/4943).
 //
-// Installation
+// # Installation
 //
 // Alex Cesaro's quotedprintable package (https://godoc.org/gopkg.in/alexcesaro/quotedprintable.v1)
 // is the only external dependency. It's likely to be included in Go 1.5 in a new
 // mime/quotedprintable package (https://codereview.appspot.com/132680044).
-// 	go get godoc.org/gopkg.in/alexcesaro/quotedprintable.v1
-// 	go get github.com/mohamedattahri/mail
+//
+//	go get godoc.org/gopkg.in/alexcesaro/quotedprintable.v1
+//	go get github.com/mohamedattahri/mail
 package mail
 
 import (
@@ -309,7 +310,11 @@ func (m *Message) Bytes() []byte {
 	}
 	// Message-ID; randomly generated value if missing in the Header map.
 	if m.MessageID() == "" {
-		fmt.Fprintf(output, "Message-ID: <%s.%s>", randomString(messageIDLength), m.From().Address)
+		if m.From() != nil {
+			fmt.Fprintf(output, "Message-ID: <%s.%s>", randomString(messageIDLength), m.From().Address)
+		} else {
+			fmt.Fprintf(output, "Message-ID: <%s%s>", randomString(messageIDLength), "@nowhere.localhost")
+		}
 		output.WriteString(crlf)
 	}
 	output.WriteString(crlf)
@@ -914,10 +919,11 @@ var ErrPartClosed = errors.New("mail: part has been closed")
 // an attachment.
 //
 // Example:
-// 	alt, _ := part.AddMultipart("multipart/mixed")
-// 	alt.AddText("text/plain", text)
-// 	alt.AddAttachment("gopher.png", "", image)
-// 	alt.Close()
+//
+//	alt, _ := part.AddMultipart("multipart/mixed")
+//	alt.AddText("text/plain", text)
+//	alt.AddAttachment("gopher.png", "", image)
+//	alt.Close()
 func (p *Multipart) AddMultipart(mediaType string) (nested *Multipart, err error) {
 	if !strings.HasPrefix(mediaType, "multipart") {
 		return nil, errors.New("mail: mediaType must start with the word \"multipart\" as in multipart/mixed or multipart/alter")
@@ -1010,7 +1016,8 @@ func (p *Multipart) AddText(mediaType string, r io.Reader) error {
 //
 // In the following example, the media MIME type will be set to "image/png"
 // based on the ".png" extension of the filename "gopher.png":
-// 	part.AddAttachment(Inline, "gopher.png", "", image)
+//
+//	part.AddAttachment(Inline, "gopher.png", "", image)
 func (p *Multipart) AddAttachment(attachType AttachmentType, filename, contentIdName, mediaType string, r io.Reader) (err error) {
 	if p.isClosed {
 		return ErrPartClosed
@@ -1119,10 +1126,11 @@ func createPart(w io.Writer, header textproto.MIMEHeader, mediaType string, boun
 // part inside which other parts, texts and attachments can be nested.
 //
 // Example:
-// 	multipart := NewMultipart("multipart/alternative", msg)
-// 	multipart.AddPart("text/plain", text)
-// 	multipart.AddPart("text/html", html)
-// 	multipart.Close()
+//
+//	multipart := NewMultipart("multipart/alternative", msg)
+//	multipart.AddPart("text/plain", text)
+//	multipart.AddPart("text/html", html)
+//	multipart.Close()
 func NewMultipart(mediaType string, msg *Message) (root *Multipart) {
 	boundary := randomString(boundaryLength)
 	msg.root = createPart(msg.Body, make(textproto.MIMEHeader), mediaType, boundary)
