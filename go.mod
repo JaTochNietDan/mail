@@ -1,4 +1,4 @@
-module github.com/mail
+module github.com/JaTochNietDan/mail
 
 go 1.24.0
 
